@@ -32,6 +32,7 @@ public:
     std::string getAccountName() const;  // display account name
     int getAccountNumber() const;        // display account number
     double getAccountBalance() const;    // display account balance
+    int getId() const;                        // get account ID
     
     // -- Mutators -- ,cannot change number and accountName, balance may be needed by admin
     void setAccountBalance(double accountBalance);
@@ -45,6 +46,5 @@ public:
 
 private:
     void addReward(double amount);      // private helper functions to add reward and
-    int getId() const;                        // get account ID
 
 };

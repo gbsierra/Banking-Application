@@ -27,5 +27,6 @@ public:
   void fillVector (std::ifstream &input);								// helper function
   std::string printVector();											// admin function print all accounts
   void addAccount();													// admin function add account
+  void removeAccount(const int id);										// function remove account
   void sort(std::vector<std::shared_ptr<BankAccount>> &accountsVector); // sort accounts
 };

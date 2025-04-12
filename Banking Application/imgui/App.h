@@ -6,9 +6,11 @@ namespace App {
     // Renders Main Applicatino Window
     static void RenderApplicationWindow();
     // Renders Manage Customer Funds Window
-    static void RenderManageCustomerFunds();
+    static void RenderManageCustomerFundsWindow();
     // Renders Create Customer Account Window
-    static void RenderCreateCustomerAccount();
+    static void RenderCreateCustomerAccountWindow();
+    // Renders Remove Customer Account Window
+    static void RenderRemoveCustomerAccountWindow();
     // Renders Customer List Window
     static void RenderCustomerListWindow();
     // Renders Welcome Window

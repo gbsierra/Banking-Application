@@ -9,8 +9,8 @@
 
 
 //static vars
-const double BankAccount::REWARD_RATE = 1.1;
-const double BankAccount::MIN_REWARD_AMOUNT = 1.1;
+const double BankAccount::REWARD_RATE = .02; // 2% reward rate
+const double BankAccount::MIN_REWARD_AMOUNT = 2000; // 2000$ min deposit for reward rate
 int BankAccount::count = 0;
 
 // -- Constructors -- 
@@ -50,6 +50,10 @@ int BankAccount::getAccountNumber() const {
 double BankAccount::getAccountBalance() const {
     return this->accountBalance;
 }
+// get account ID
+int BankAccount::getId() const {
+    return this->id;
+}
 // -- Mutators -- cannot change number and accountName, setting balance may be needed by admin
 void BankAccount::setAccountBalance(double accountBalance){
     this->accountBalance = accountBalance;
@@ -77,7 +81,7 @@ int BankAccount::getCount(){
 }
 // deposit amount and include rewards if any
 void BankAccount::deposit(double amount){
-    if(amount>MIN_REWARD_AMOUNT){
+    if(amount>=MIN_REWARD_AMOUNT){
         addReward(amount);
     }
     this->accountBalance = this->accountBalance + amount;
@@ -90,9 +94,6 @@ bool BankAccount::equals(BankAccount other) const{
 void BankAccount::addReward(double amount){
     this->accountBalance = this->accountBalance + amount*REWARD_RATE;
 }
-// get account ID
-int BankAccount::getId() const{
-    return this->id;
-}
+
 
           

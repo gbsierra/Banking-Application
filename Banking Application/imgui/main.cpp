@@ -104,7 +104,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 
     // Create application window
-    WNDCLASSEXW wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"Banking Application", nullptr };
+    WNDCLASSEXW wc = {
+    sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr),
+    nullptr, nullptr, nullptr, nullptr, L"Banking Application", nullptr
+    };
     ::RegisterClassExW(&wc);
 
     // Get the screen dimensions
@@ -113,7 +116,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Set the window width and height
     int windowWidth = 800;
-    int windowHeight = 600;
+    int windowHeight = 650;
 
     // Calculate the centered position
     int posX = (screenWidth - windowWidth) / 2;
@@ -123,7 +126,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     HWND hwnd = ::CreateWindowW(
         wc.lpszClassName,
         L"Banking Application",
-        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+        WS_OVERLAPPED | WS_VISIBLE | WS_POPUP | WS_MINIMIZEBOX,
         posX,
         posY,
         windowWidth,
@@ -133,7 +136,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         wc.hInstance,
         nullptr
     );
-
+    if (hwnd) {
+        // Create a region with rounded corners
+        HRGN hRgn = CreateRoundRectRgn(0, 0, windowWidth, windowHeight, 25, 25);
+        if (hRgn) {
+            // Apply the region to the window
+            SetWindowRgn(hwnd, hRgn, TRUE);
+        }
+    }
     // Initialize Direct3D
     if (!CreateDeviceD3D(hwnd)) {
         CleanupDeviceD3D();

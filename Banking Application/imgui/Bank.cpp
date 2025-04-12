@@ -1,4 +1,4 @@
-// *********************************************
+﻿// *********************************************
 // Date: 4/11/2025
 // Description:
 //   Practice with object oriented design
@@ -43,10 +43,56 @@ void Bank::withdraw(){
             if(amount > acc->getAccountBalance()){
                 std::cout << "\nInsufficient Funds" << std::endl;
             }
-            else{
+            else {
                 acc->BankAccount::withdraw(amount);
                 std::cout << "\nAmount Withdrawn from account" << std::endl;
+
+                // 1. Read the entire file into a vector of strings.
+                 std::ifstream inFile("imgui/BankData.txt");
+
+                 std::vector<std::string> lines;
+                 std::string line;
+                 while (std::getline(inFile, line)) {
+                     lines.push_back(line);
+                 }
+                 inFile.close();
+
+                 // 2. Find and remove the old account entry.
+                 int idToRemove = acc->getId();
+                 lines.erase(std::remove_if(lines.begin(), lines.end(),
+                     [idToRemove](const std::string& currentLine) {
+                         std::istringstream iss(currentLine);
+                         std::string firstName, lastName;
+                         int id;
+                         iss >> firstName >> lastName >> id;
+                         return id == idToRemove;
+                     }),
+                     lines.end());
+
+                 // 3. Append the updated account information.
+                 std::ofstream outFile("imgui/BankData.txt"); // Open in write mode, which overwrites
+
+                 // Break the full name back into first and last names
+                 std::istringstream iss(accountName);
+                 std::string firstName, lastName;
+                 iss >> firstName >> lastName;
+
+                 int id = acc->getId();
+                 double updatedBalance = acc->getAccountBalance();
+
+                 outFile << firstName << " " << lastName << " "
+                     << id << " "
+                     << accountNumber << " "
+                     << updatedBalance << std::endl;
+
+                 // 4. Write all the remaining lines back to the file.
+                 for (const auto& remainingLine : lines) {
+                     outFile << remainingLine << std::endl;
+                 }
+
+                 outFile.close();
             }
+
             found = true;
             std::cout << "Press Enter to continue..." << std::endl;
             std::cin.ignore();
@@ -128,14 +174,58 @@ void Bank::deposit(){
     bool found = false;
     for(const std::shared_ptr<BankAccount>& acc : accountsVector){
         if(acc->getAccountName()==accountName && acc->getAccountNumber()==accountNumber){ 
+
+            // 1. Read the entire file into a vector of strings.
+            std::ifstream inFile("imgui/BankData.txt");
+
+            std::vector<std::string> lines;
+            std::string line;
+            while (std::getline(inFile, line)) {
+                lines.push_back(line);
+            }
+            inFile.close();
+
+            // 2. Find and remove the old account entry.
+            int idToRemove = acc->getId();
+            lines.erase(std::remove_if(lines.begin(), lines.end(),
+                [idToRemove](const std::string& currentLine) {
+                    std::istringstream iss(currentLine);
+                    std::string firstName, lastName;
+                    int id;
+                    iss >> firstName >> lastName >> id;
+                    return id == idToRemove;
+                }),
+                lines.end());
+
+            // 3. Append the updated account information.
+            std::ofstream outFile("imgui/BankData.txt"); // Open in write mode, which overwrites
+
+            // Break the full name back into first and last names
+            std::istringstream iss(accountName);
+            std::string firstName, lastName;
+            iss >> firstName >> lastName;
+
+            int id = acc->getId();
             acc->deposit(amount);
+            double updatedBalance = acc->getAccountBalance();
+
+            outFile << firstName << " " << lastName << " "
+                << id << " "
+                << accountNumber << " "
+                << updatedBalance << std::endl;
+
+            // 4. Write all the remaining lines back to the file.
+            for (const auto& remainingLine : lines) {
+                outFile << remainingLine << std::endl;
+            }
+
+            outFile.close();
+
+            found = true;
             std::cout << "\nAmount deposited into account" << std::endl;
             std::cout << "Press Enter to continue..." << std::endl;
             std::cin.ignore();
             std::cin.get();
-
-            found = true;
-            break;
         }
     }
     if(!found){
@@ -208,17 +298,17 @@ void Bank::addAccount() {
     std::cout << "Enter New Customer ID: ";
     std::cin >> id;
 
-    if (id < 1000 || id > 9999) { // Ensure ID is a 4-digit number
-        std::cout << "Error: ID must be a 4-digit number.\n";
+    if (id < 100000 || id > 999999) { // Ensure ID is a 6-digit number
+        std::cout << "Error: ID must be a 6-digit number.\n";
         return;
     }
 
     // Input and validation for account number
-    std::cout << "Enter New account number: ";
+    std::cout << "Enter New Account Number: ";
     std::cin >> accountNumber;
 
-    if (accountNumber < 100000 || accountNumber > 999999) { // Ensure account number is a 6-digit number
-        std::cout << "Error: Account number must be a 6-digit number.\n";
+    if (accountNumber < 1000 || accountNumber > 9999) { // Ensure account number is a 4-digit number
+        std::cout << "Error: Account number must be a 4-digit number.\n";
         return;
     }
 
@@ -237,6 +327,72 @@ void Bank::addAccount() {
         std::cout << "Error opening file!" << std::endl;
     }
 }
+// Function to remove an account
+void Bank::removeAccount(const int id) {
+    bool accountFound = false;
+
+    // Remove from vector
+    auto it = std::remove_if(accountsVector.begin(), accountsVector.end(),
+        [&id, &accountFound](const std::shared_ptr<BankAccount>& account) {
+            if (account->getId() == id) {
+                accountFound = true;
+                return true;
+            }
+            return false;
+        });
+    accountsVector.erase(it, accountsVector.end());
+
+    if (!accountFound) {
+        std::cout << "Account ID " << id << " not found in memory.\n";
+    }
+
+    // Open the file for reading and writing
+    std::ifstream inFile("imgui/BankData.txt");
+    std::ofstream outFile("imgui/BankData_temp.txt", std::ios::trunc);
+
+    if (!inFile.is_open() || !outFile.is_open()) {
+        std::cerr << "Error opening file for reading or writing.\n";
+        return;
+    }
+
+    std::string line;
+    while (std::getline(inFile, line)) {
+        std::istringstream iss(line);
+
+        std::string firstName, lastName, accountNumber;
+        int currentId;
+        double balance;
+
+        // Parse the line
+        if (iss >> firstName >> lastName >> currentId >> accountNumber >> balance) {
+            // Only write to temp file if the current ID doesn't match the one to be removed
+            if (currentId != id) {
+                outFile << line << "\n";
+            }
+            else {
+                // Account found and removed (skip writing this line)
+                accountFound = true;
+            }
+        }
+        else {
+            // If there's an error parsing the line, preserve it (optional)
+            outFile << line << "\n";
+        }
+    }
+
+    inFile.close();
+    outFile.close();
+
+    // Replace old file with the new one
+    if (std::remove("imgui/BankData.txt") != 0 || std::rename("imgui/BankData_temp.txt", "imgui/BankData.txt") != 0) {
+        std::cerr << "Error replacing the old file.\n";
+    }
+    else if (accountFound) {
+        std::cout << "Account ID " << id << " removed successfully.\n";
+    }
+}
+
+
 // sort accounts
 void Bank::sort(std::vector<std::shared_ptr<BankAccount>> &accountsVector){
 }
