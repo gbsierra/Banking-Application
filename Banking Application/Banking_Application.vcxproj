@@ -121,10 +121,11 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dxgi.lib;d3d12.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -155,6 +156,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="imgui\BankData.txt" />
+    <Text Include="imgui\deposits.txt" />
+    <Text Include="imgui\withdrawals.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="imgui\Arial.TTF" />

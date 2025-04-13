@@ -4,6 +4,7 @@
 #include <d3d12.h>
 #include <dxgi1_4.h>
 #include <tchar.h>
+#include <windowsx.h>
 
 #include "App.h"
 
@@ -130,12 +131,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         posX,
         posY,
         windowWidth,
-        windowHeight,
+        windowHeight, 
         nullptr,
         nullptr,
         wc.hInstance,
         nullptr
     );
+    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+
     if (hwnd) {
         // Create a region with rounded corners
         HRGN hRgn = CreateRoundRectRgn(0, 0, windowWidth, windowHeight, 25, 25);
@@ -507,6 +510,16 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         ::PostQuitMessage(0);
         return 0;
+    case WM_NCHITTEST:
+        // mouse cursor position relative to the window
+        POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+        ScreenToClient(hWnd, &pt);
+
+        // If within header
+        if (pt.y < 50 && pt.x < 735) {
+            return HTCAPTION;  // HTCAPTION means the window can be dragged
+        }
+        return DefWindowProcW(hWnd, msg, wParam, lParam);
     }
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
 }

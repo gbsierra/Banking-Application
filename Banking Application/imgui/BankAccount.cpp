@@ -14,7 +14,6 @@ const double BankAccount::MIN_REWARD_AMOUNT = 2000; // 2000$ min deposit for rew
 int BankAccount::count = 0;
 
 // -- Constructors -- 
-// default contructor
 BankAccount::BankAccount(){
     accountName = "";
     accountNumber = 0;
@@ -61,6 +60,7 @@ void BankAccount::setAccountBalance(double accountBalance){
 // display the string representation of the bank account
 std::string BankAccount::toString() const{
     std::ostringstream stream;
+    stream.imbue(std::locale("")); //add commas
     stream << std::fixed<< std::setprecision(2) << this->getAccountBalance();
     std::string bal = stream.str();
      return ("- Name: " + this->getAccountName() + "\n"

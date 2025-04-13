@@ -22,29 +22,29 @@ private:
 
 public:
     // -- Constructors -- 
-    BankAccount();                                                                              // default constructor
-    BankAccount(std::string accountName, int id, int accountNumber, double accountBalance);     // custom constructor
+    BankAccount();                                                                           // default constructor
+    BankAccount(std::string accountName, int id, int accountNumber, double accountBalance);  // custom constructor
     /*copy constructor
     BankAccount(BankAccount& other); */
     
 
     // -- Accessors -- 
-    std::string getAccountName() const;  // display account name
-    int getAccountNumber() const;        // display account number
-    double getAccountBalance() const;    // display account balance
-    int getId() const;                        // get account ID
+    std::string getAccountName() const;         // display account name
+    int getAccountNumber() const;               // display account number
+    double getAccountBalance() const;           // display account balance
+    int getId() const;                          // get account ID
     
-    // -- Mutators -- ,cannot change number and accountName, balance may be needed by admin
-    void setAccountBalance(double accountBalance);
+    // -- Mutators --
+    void setAccountBalance(double accountBalance); // set account balance
 
 
-    std::string toString() const;             // display the string representation of the bank account
-    bool withdraw(double amount);       //withdraw the amount if possible
-    int getCount();                     // display the number of existing bank accounts
-    void deposit(double amount);        // deposit amount and include rewards if any
-    bool equals(BankAccount other) const;     // check if duplicate account exists
+    std::string toString() const;               // display the string representation of the bank account
+    bool withdraw(double amount);               // withdraw the amount if possible
+    int getCount();                             // display the number of existing bank accounts
+    void deposit(double amount);                // deposit amount and include rewards if any
+    bool equals(BankAccount other) const;       // check if duplicate account exists
 
 private:
-    void addReward(double amount);      // private helper functions to add reward and
+    void addReward(double amount);              // private helper functions to add reward and
 
 };

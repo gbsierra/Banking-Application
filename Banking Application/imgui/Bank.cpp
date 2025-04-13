@@ -6,6 +6,7 @@
 #include "Bank.h"
 #include <cctype>
 #include <string>
+#include<iomanip>
 
 // constructor that reads from .txt file by calling the fillVector method to populate the database
 Bank::Bank(std::string filename){
@@ -22,18 +23,35 @@ void Bank::withdraw(){
     std::string accountName;
     int accountNumber;
     double amount;
-    
-    std::cout << "What is the Account First Name ? ";
-    std::cin >> accountName;
-
-    std::cout << "What is the Account Last Name ? ";
     std::string temp;
+
+    // Input and validation for first name
+    std::cout << "Enter Customer first name: ";
+    std::cin >> accountName;
+    for (char c : accountName) {
+        if (!std::isalpha(c)) {
+            std::cout << "Error: First name must contain only alphabetic characters.\n";
+            return;
+        }
+    }
+    // Input and validation for last name
+    std::cout << "Enter Customer last name: ";
     std::cin >> temp;
+    for (char c : temp) {
+        if (!std::isalpha(c)) {
+            std::cout << "Error: Last name must contain only alphabetic characters.\n";
+            return;
+        }
+    }
     accountName += " " + temp;
-
-    std::cout << "What is the account Number ? ";
+    // Input and validation for account number
+    std::cout << "Enter Account Number: ";
     std::cin >> accountNumber;
-
+    if (accountNumber < 1000 || accountNumber > 9999) { // Ensure account number is a 4-digit number
+        std::cout << "Error: Account number must be a 4-digit number.\n";
+        return;
+    }
+    // Input for dollar amount
     std::cout << "What is the dollar amount ? ";
     std::cin >> amount;
 
@@ -46,6 +64,16 @@ void Bank::withdraw(){
             else {
                 acc->BankAccount::withdraw(amount);
                 std::cout << "\nAmount Withdrawn from account" << std::endl;
+
+                //store withdrawal in txt
+                std::ofstream outFile2("imgui/withdrawals.txt", std::ios::app); // Open file in append mode
+                if (outFile2.is_open()) {
+                    outFile2 << acc->BankAccount::getAccountName() << " " << amount << "\n";
+                    outFile2.close();
+                }
+                else {
+                    std::cerr << "Unable to open file for saving withdrawals!" << std::endl;
+                }
 
                 // 1. Read the entire file into a vector of strings.
                  std::ifstream inFile("imgui/BankData.txt");
@@ -94,17 +122,11 @@ void Bank::withdraw(){
             }
 
             found = true;
-            std::cout << "Press Enter to continue..." << std::endl;
-            std::cin.ignore();
-            std::cin.get();
             break;
         }
     }
     if(!found){
         std::cout << "\n\nAccount not found!" << std::endl;
-        std::cout << "Press Enter to continue..." << std::endl;
-        std::cin.ignore();
-        std::cin.get();
     }
 
 }
@@ -156,24 +178,51 @@ void Bank::deposit(){
     std::string accountName;
     int accountNumber;
     double amount;
-    
-    std::cout << "What is the Account First Name ? ";
-    std::cin >> accountName;
-
-    std::cout << "What is the Account Last Name ? ";
     std::string temp;
+    
+    // Input and validation for first name
+    std::cout << "Enter Customer first name: ";
+    std::cin >> accountName;
+    for (char c : accountName) {
+        if (!std::isalpha(c)) {
+            std::cout << "Error: First name must contain only alphabetic characters.\n";
+            return;
+        }
+    }
+    // Input and validation for last name
+    std::cout << "Enter Customer last name: ";
     std::cin >> temp;
+    for (char c : temp) {
+        if (!std::isalpha(c)) {
+            std::cout << "Error: Last name must contain only alphabetic characters.\n";
+            return;
+        }
+    }
     accountName += " " + temp;
-
-    std::cout << "What is the account Number ? ";
+    // Input and validation for account number
+    std::cout << "Enter Account Number: ";
     std::cin >> accountNumber;
-
+    if (accountNumber < 1000 || accountNumber > 9999) { // Ensure account number is a 4-digit number
+        std::cout << "Error: Account number must be a 4-digit number.\n";
+        return;
+    }
+    // Input for dollar amount
     std::cout << "What is the dollar amount ? ";
     std::cin >> amount;
 
     bool found = false;
     for(const std::shared_ptr<BankAccount>& acc : accountsVector){
         if(acc->getAccountName()==accountName && acc->getAccountNumber()==accountNumber){ 
+
+            //store deposit in txt
+            std::ofstream outFile2("imgui/deposits.txt", std::ios::app); // Open file in append mode
+            if (outFile2.is_open()) {
+                outFile2 << acc->BankAccount::getAccountName() << " " << amount << "\n";
+                outFile2.close();
+            }
+            else {
+                std::cerr << "Unable to open file for saving withdrawals!" << std::endl;
+            }
 
             // 1. Read the entire file into a vector of strings.
             std::ifstream inFile("imgui/BankData.txt");
@@ -223,16 +272,11 @@ void Bank::deposit(){
 
             found = true;
             std::cout << "\nAmount deposited into account" << std::endl;
-            std::cout << "Press Enter to continue..." << std::endl;
-            std::cin.ignore();
-            std::cin.get();
+
         }
     }
     if(!found){
         std::cout << "\n\nAccount not found!" << std::endl;
-        std::cout << "Press Enter to continue..." << std::endl;
-        std::cin.ignore();
-        std::cin.get();
     }
 
 }
@@ -267,13 +311,54 @@ std::string Bank::printVector(){
     }
     return oss.str();
 }
+// admin function print all deposits
+std::string Bank::printDeposits() {
+    std::ostringstream oss;
+
+    std::ifstream file("imgui/deposits.txt");
+    if (file.is_open()) {
+        std::string firstname, lastname;
+        double amount;
+        while (file >> firstname >> lastname >> amount) {
+            oss.imbue(std::locale("")); //add commas
+            oss << firstname << " " << lastname << " deposited " << amount << "$\n"
+                << "-----------------------------------------------------------------\n";
+        }
+        file.close();
+    }
+    else {
+        oss << "Error: Unable to open deposits file.";
+    }
+
+    return oss.str();
+}
+// admin function print all withdrawals
+std::string Bank::printWithdrawals() {
+    std::ostringstream oss;
+
+    std::ifstream file("imgui/withdrawals.txt");
+    if (file.is_open()) {
+        std::string firstname, lastname;
+        double amount;
+        while (file >> firstname >> lastname >> amount) {
+            oss.imbue(std::locale("")); //add commas
+            oss << firstname << " " << lastname << " withdrew " << amount << "$\n"
+                << "-----------------------------------------------------------------\n";
+        }
+        file.close();
+    }
+    else {
+        oss << "Error: Unable to open withdrawals file.";
+    }
+
+    return oss.str();
+}
 // admin function add account
 void Bank::addAccount() {
     std::string first, last;
     int id;
     int accountNumber;
 
-    // Prompt user for input
     // Input and validation for first name
     std::cout << "Enter New Customer first name: ";
     std::cin >> first;
@@ -283,7 +368,6 @@ void Bank::addAccount() {
             return;
         }
     }
-
     // Input and validation for last name
     std::cout << "Enter New Customer last name: ";
     std::cin >> last;
@@ -293,20 +377,16 @@ void Bank::addAccount() {
             return;
         }
     }
-
     // Input and validation for ID
     std::cout << "Enter New Customer ID: ";
     std::cin >> id;
-
     if (id < 100000 || id > 999999) { // Ensure ID is a 6-digit number
         std::cout << "Error: ID must be a 6-digit number.\n";
         return;
     }
-
     // Input and validation for account number
     std::cout << "Enter New Account Number: ";
     std::cin >> accountNumber;
-
     if (accountNumber < 1000 || accountNumber > 9999) { // Ensure account number is a 4-digit number
         std::cout << "Error: Account number must be a 4-digit number.\n";
         return;
@@ -394,5 +474,22 @@ void Bank::removeAccount(const int id) {
 
 
 // sort accounts
-void Bank::sort(std::vector<std::shared_ptr<BankAccount>> &accountsVector){
+#include <algorithm>
+#include <sstream>
+
+std::string Bank::sort() {
+    // Sort the accountsVector in descending order, by balance
+    std::sort(accountsVector.begin(), accountsVector.end(),
+        [](const std::shared_ptr<BankAccount>& a, const std::shared_ptr<BankAccount>& b) {
+            return a->getAccountBalance() > b->getAccountBalance();
+        });
+
+    // Convert sorted accounts into a string format
+    std::ostringstream oss;
+    for (const auto& account : accountsVector) {
+        oss << account->toString() << "\n";
+    }
+
+    // Return the sorted accounts as a string
+    return oss.str();
 }

@@ -43,6 +43,12 @@
     <Text Include="imgui\BankData.txt">
       <Filter>Bank</Filter>
     </Text>
+    <Text Include="imgui\deposits.txt">
+      <Filter>Bank</Filter>
+    </Text>
+    <Text Include="imgui\withdrawals.txt">
+      <Filter>Bank</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Font Include="imgui\Arial.TTF" />

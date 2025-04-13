@@ -1,0 +1,8 @@
+Cameron Diaz 1000
+Howard Chen 100
+Victor Hugo 1000
+Lily Harris 200
+Cameron Diaz 100
+Howard Chen 101
+Victor Hugo 920
+Lily Harris 201

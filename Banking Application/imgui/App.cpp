@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <Windows.h>
 
-
 // App Namespace for imgui implementation
 namespace App {
 
@@ -18,27 +17,28 @@ namespace App {
     static bool create_account_window = false;   // Create Account Window
     static bool remove_account_window = false;   // Remove Account Window
 
-
     static std::string name = "Bank Teller";     // Bank Teller Name
 
     // Bank Data
     Bank myBank("imgui/BankData.txt");           // populate myBank with accounts
     std::string accounts = myBank.printVector(); // string version of BankData
+    std::string sorted_accounts = myBank.sort();
+    std::string deposits = myBank.printDeposits();
+    std::string withdrawals = myBank.printWithdrawals();
+
     int accId;
 
     bool testing = false; //if true, displays BankData list in terminal on launch
-
 
     // Renders Main Header
     void RenderApplicationHeader() {
 
         // Set the header position at the top of the screen
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 50)); // Full width and fixed height
-        ImGui::SetNextWindowBgAlpha(1.0f); // Fully opaque background
-
-        // Create the topmost header window
-        ImGui::Begin("HeaderWindow", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNav );
+        ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, 50));
+        ImGui::SetNextWindowBgAlpha(0.9f);
+        //ImGui::SetNextWindowFocus();
+        ImGui::Begin("HeaderWindow", NULL, ImGuiWindowFlags_NoDecoration );
 
         // Application name
         ImGui::SetWindowFontScale(1.4f);
@@ -59,6 +59,7 @@ namespace App {
 
         ImGui::End();
     }
+    
     // Renders Main Window
     void RenderApplicationWindow() {
         ImGui::GetStyle().WindowRounding = 0.0f;
@@ -70,11 +71,11 @@ namespace App {
 
         RenderApplicationHeader();
 
-        ImGui::SetCursorPosX(620);
-        ImGui::Text("Options:");
+        ImGui::SetCursorPosX(543);
+        ImGui::Separator();
 
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 6);
-        ImGui::SetCursorPosX(560);
+        ImGui::SetCursorPosX(565);
         if (ImGui::Button("Manage Customer Funds", ImVec2(200, 50))) {
             manage_funds_window = true;
         }
@@ -89,7 +90,7 @@ namespace App {
             ImGui::Text("Ready from client");
             ImGui::EndTooltip();
         }
-        ImGui::SetCursorPosX(560);
+        ImGui::SetCursorPosX(565);
         if (ImGui::Button("Create Customer Account", ImVec2(200, 50))) {
             create_account_window = true;
         }
@@ -106,7 +107,7 @@ namespace App {
             ImGui::Text("Ready for system");
             ImGui::EndTooltip();
         }
-        ImGui::SetCursorPosX(560);
+        ImGui::SetCursorPosX(565);
         if (ImGui::Button("Remove Customer Account", ImVec2(200, 50))) {
             remove_account_window = true;
         }
@@ -119,14 +120,18 @@ namespace App {
             ImGui::Text("Ready from client");
             ImGui::EndTooltip();
         }
-        ImGui::SetCursorPosX(560);
-        if (ImGui::Button("Future Button2", ImVec2(200, 50))) {
-        }
-        if (ImGui::IsItemHovered()) {
-            ImGui::BeginTooltip();
-            ImGui::Text("test message");
-            ImGui::EndTooltip();
-        }
+        //ImGui::SetCursorPosX(565);
+        //if (ImGui::Button("Future Button2", ImVec2(200, 50))) {
+        //}
+        //if (ImGui::IsItemHovered()) {
+         //   ImGui::BeginTooltip();
+         //   ImGui::Text("test message");
+         //   ImGui::EndTooltip();
+        //}
+
+        ImGui::SetCursorPosX(543);
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+        ImGui::Separator();
 
         if (testing) {
             OpenTerminal([]() {std::cout << accounts << std::endl;}, true);
@@ -136,6 +141,7 @@ namespace App {
         ImGui::End();
         ImGui::PopStyleColor();
     }
+    
     // Renders Manage Customer Funds Window
     static void RenderManageCustomerFundsWindow() {
         if (manage_funds_window) {
@@ -143,13 +149,14 @@ namespace App {
 
             // Withdraw Button
             if (ImGui::Button("Withdraw")) {
-                OpenTerminal([]() {myBank.withdraw();}, false);
-
+                OpenTerminal([]() {myBank.withdraw();}, true);
+                manage_funds_window = false;
             }
             ImGui::SameLine();
             // Deposit Button
             if (ImGui::Button("Deposit")) {
-                OpenTerminal([]() {myBank.deposit();}, false);
+                OpenTerminal([]() {myBank.deposit();}, true);
+                manage_funds_window = false;
             }
             ImGui::SameLine();
             // Cancel Button
@@ -160,6 +167,7 @@ namespace App {
             ImGui::End();
         }
     } 
+    
     // Renders Create Customer Account Window
     static void RenderCreateCustomerAccountWindow() {
         if (create_account_window) {
@@ -170,6 +178,7 @@ namespace App {
             ImGui::End();
         }
     }
+    
     // Renders Remove Customer Account Window
     static void RenderRemoveCustomerAccountWindow() {
         if (remove_account_window) {
@@ -192,6 +201,7 @@ namespace App {
             ImGui::End();
         }
     }
+    
     // Renders Welcome Window
     static void RenderWelcomeWindow() {
         ImGui::Begin("Welcome", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
@@ -217,6 +227,7 @@ namespace App {
 
         ImGui::End();
     }
+    
     // Renders Customer List Window
     static void RenderCustomerListWindow() {
         ImGui::GetStyle().WindowRounding = 10.0f;
@@ -232,37 +243,41 @@ namespace App {
 
         ImGui::End();
     }
-    // Renders List Window 1
+    
+    // Renders List Window 1 (sorted descending)
     static void RenderList1Window() {
-        ImGui::Begin("List 1:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
+        ImGui::Begin("Highest Balances:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
 
         ImGui::GetStyle().WindowRounding = 10.0f;
         ImGui::SetWindowFontScale(0.865f);
-        ImGui::Text("test1");
+        ImGui::Text("%s", sorted_accounts.c_str());
 
 
         ImGui::End();
     }
-    // Renders List Window 2
+    
+    // Renders List Window 2 (recent withdrawals)
     static void RenderList2Window() {
-        ImGui::Begin("List 2:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
+        ImGui::Begin("Recent Withdrawals:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
 
         ImGui::GetStyle().WindowRounding = 10.0f;
         ImGui::SetWindowFontScale(0.865f);
-        ImGui::Text("test2");
+        ImGui::Text("%s", withdrawals.c_str());
 
         ImGui::End();
     }
-    // Renders List Window 3
+    
+    // Renders List Window 3 (recent deposits)
     static void RenderList3Window() {
-        ImGui::Begin("List 3:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
+        ImGui::Begin("Recent Deposits:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
 
         ImGui::GetStyle().WindowRounding = 10.0f;
         ImGui::SetWindowFontScale(0.865f);
-        ImGui::Text("test3");
+        ImGui::Text("%s", deposits.c_str());
 
         ImGui::End();
     }
+    
     // Main Render Function for UI
     void RenderUI() {
         RenderApplicationWindow();
@@ -276,6 +291,7 @@ namespace App {
 
         RenderWelcomeWindow();
     }
+
 
     // Open a terminal
     static void OpenTerminal(std::function<void()> command, bool wait) {
@@ -297,6 +313,9 @@ namespace App {
         fclose(in);
         FreeConsole(); //free allocated console
 
-        accounts = myBank.printVector(); //update string
+        accounts = myBank.printVector(); //update strings 
+        sorted_accounts = myBank.sort();
+        deposits = myBank.printDeposits();
+        withdrawals = myBank.printWithdrawals();
     }
 }
