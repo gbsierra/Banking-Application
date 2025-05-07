@@ -1,10 +1,10 @@
 # Banking Application 🏦
 
+A Mock Banking Application using C++ object-oriented programming, demonstrating principles such as encapsulation, inheritance, and polymorphism. The frontend leverages ImGui, a popular GUI library for rendering a modern, interactive interface.
 
 
 ## Screenshots 📸
 
-- **Application:**:  
   ![Application](/screenshots/menu.png)  
 
 
