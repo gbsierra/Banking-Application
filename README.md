@@ -1,13 +1,15 @@
 # Banking Application 🏦
 
 
-## Features
-
 
 ## Screenshots 📸
 
+- **Application:**:  
+  ![Application](/screenshots/menu.png)  
 
-### Getting Started 🚀
+
+
+### Contributing
 
 To contribute to this project and run the application without exe, follow these steps:
 
