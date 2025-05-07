@@ -1,56 +1,81 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="imgui\App.cpp" />
-    <ClCompile Include="imgui\backends\imgui_impl_dx12.cpp" />
-    <ClCompile Include="imgui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
-    <ClCompile Include="imgui\imgui_draw.cpp" />
-    <ClCompile Include="imgui\imgui_tables.cpp" />
-    <ClCompile Include="imgui\imgui_widgets.cpp" />
-    <ClCompile Include="imgui\main.cpp" />
-    <ClCompile Include="imgui\Bank.cpp">
-      <Filter>Bank</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\BankAccount.cpp">
-      <Filter>Bank</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="imgui\App.h" />
-    <ClInclude Include="imgui\backends\imgui_impl_dx12.h" />
-    <ClInclude Include="imgui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="imgui\imconfig.h" />
-    <ClInclude Include="imgui\imgui.h" />
-    <ClInclude Include="imgui\imgui_internal.h" />
-    <ClInclude Include="imgui\imstb_rectpack.h" />
-    <ClInclude Include="imgui\imstb_textedit.h" />
-    <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="imgui\Bank.h">
-      <Filter>Bank</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\BankAccount.h">
-      <Filter>Bank</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Bank">
       <UniqueIdentifier>{9deca3a0-66aa-4c4b-864a-1add39368c82}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{9e69b3b0-8c9c-4513-9fe4-c65b77652d49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui\backend">
+      <UniqueIdentifier>{172055aa-3807-4ed3-a920-6d7838c43ce9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="imgui\BankData.txt">
+    <ClCompile Include="src\Bank.cpp">
       <Filter>Bank</Filter>
-    </Text>
-    <Text Include="imgui\deposits.txt">
+    </ClCompile>
+    <ClCompile Include="src\BankAccount.cpp">
       <Filter>Bank</Filter>
-    </Text>
-    <Text Include="imgui\withdrawals.txt">
+    </ClCompile>
+    <ClCompile Include="src\SavingsAccount.cpp">
       <Filter>Bank</Filter>
-    </Text>
+    </ClCompile>
+    <ClCompile Include="src\CheckingAccount.cpp">
+      <Filter>Bank</Filter>
+    </ClCompile>
+    <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backends\imgui_impl_dx12.cpp">
+      <Filter>imgui\backend</Filter>
+    </ClCompile>
+    <ClCompile Include="src\backends\imgui_impl_win32.cpp">
+      <Filter>imgui\backend</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="imgui\Arial.TTF" />
+    <ClInclude Include="src\Bank.h">
+      <Filter>Bank</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BankAccount.h">
+      <Filter>Bank</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SavingsAccount.h">
+      <Filter>Bank</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CheckingAccount.h">
+      <Filter>Bank</Filter>
+    </ClInclude>
+    <ClInclude Include="src\App.h" />
+    <ClInclude Include="src\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backends\imgui_impl_win32.h">
+      <Filter>imgui\backend</Filter>
+    </ClInclude>
+    <ClInclude Include="src\backends\imgui_impl_dx12.h">
+      <Filter>imgui\backend</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

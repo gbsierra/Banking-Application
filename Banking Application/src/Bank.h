@@ -12,6 +12,8 @@
 #include <memory>
 #include <cstdlib> //for exit
 #include "BankAccount.h"
+#include "SavingsAccount.h"
+#include "CheckingAccount.h"
 
 // Bank Class Header ( Simulates a Bank, storing Bank Accounts in a vector. Provides an API for customer interaction via ATM like functions )
 class Bank{
@@ -25,10 +27,12 @@ public:
   void viewBalance();                                                   // check balance
   void deposit();                                                       // deposit amount
   void fillVector (std::ifstream &input);								// helper function
+
   std::string printVector();											// admin function print all accounts
   std::string printDeposits();											// admin function print all deposits
   std::string printWithdrawals();										// admin function print all withdrawals
+  std::string printSortedSavings();										// print sorted savings accounts
+
   void addAccount();													// admin function add account
   void removeAccount(const int id);										// function remove account
-  std::string sort();													// sort accounts
 };

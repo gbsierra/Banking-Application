@@ -164,7 +164,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Set Font/Default Color Scheme
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->AddFontFromFileTTF("imgui/Arial.ttf", 17.5f);
+    io.Fonts->AddFontFromFileTTF("src/Arial.ttf", 17.5f);
     io.Fonts->Build();
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameBorderSize = 1.0f;

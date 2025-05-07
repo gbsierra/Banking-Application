@@ -20,9 +20,9 @@ namespace App {
     static std::string name = "Bank Teller";     // Bank Teller Name
 
     // Bank Data
-    Bank myBank("imgui/BankData.txt");           // populate myBank with accounts
+    Bank myBank("src/BankData.txt");           // populate myBank with accounts
     std::string accounts = myBank.printVector(); // string version of BankData
-    std::string sorted_accounts = myBank.sort();
+    std::string sorted_accounts = myBank.printSortedSavings();
     std::string deposits = myBank.printDeposits();
     std::string withdrawals = myBank.printWithdrawals();
 
@@ -145,6 +145,8 @@ namespace App {
     // Renders Manage Customer Funds Window
     static void RenderManageCustomerFundsWindow() {
         if (manage_funds_window) {
+            ImGui::SetNextWindowPos(ImVec2(275, 163));
+            ImGui::SetNextWindowSize(ImVec2(226, 64));
             ImGui::Begin("Manage Customer Funds", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 
             // Withdraw Button
@@ -171,6 +173,8 @@ namespace App {
     // Renders Create Customer Account Window
     static void RenderCreateCustomerAccountWindow() {
         if (create_account_window) {
+            ImGui::SetNextWindowPos(ImVec2(261, 215));
+            ImGui::SetNextWindowSize(ImVec2(228, 95));
             ImGui::Begin("Add New Customer Account", nullptr, ImGuiWindowFlags_NoCollapse);
             OpenTerminal([]() {myBank.addAccount();}, true);
 
@@ -182,45 +186,62 @@ namespace App {
     // Renders Remove Customer Account Window
     static void RenderRemoveCustomerAccountWindow() {
         if (remove_account_window) {
-            ImGui::GetStyle().WindowRounding = 10.0f;
-            ImGui::Begin("Remove Customer Account", nullptr, ImGuiWindowFlags_NoCollapse);
+            ImGui::OpenPopup("Remove Customer Account");
+            remove_account_window = false;
+        }
+
+        ImGui::GetStyle().WindowRounding = 10.0f;
+        ImGui::SetNextWindowPos(ImVec2(279, 244), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(255, 132), ImGuiCond_Always);
+
+        if (ImGui::BeginPopupModal("Remove Customer Account", nullptr, ImGuiWindowFlags_NoCollapse)) {
             ImGui::InputInt("Account Id", &accId, 0, 0, ImGuiInputTextFlags_CharsDecimal);
+
             if (accId < 100000 || accId > 999999) {
                 ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Please enter a 6-digit account ID.");
             }
+
             int temp = accId;
-            if (ImGui::Button("Confirm", ImVec2(140,40))) {
+
+            if (ImGui::Button("Confirm", ImVec2(135, 40))) {
                 if (!(temp < 100000 || temp > 999999)) {
-                    OpenTerminal([temp]() {myBank.removeAccount(temp);}, true);
-                    remove_account_window = false;
-                    temp = 0;
+                    OpenTerminal([temp]() { myBank.removeAccount(temp); }, true);
                     accId = 0;
+                    ImGui::CloseCurrentPopup();
                 }
             }
+            ImGui::SameLine();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5);
+            if (ImGui::Button("Cancel", ImVec2(80, 30))) {
+                ImGui::CloseCurrentPopup();
+            }
 
-            ImGui::End();
+            ImGui::EndPopup();
         }
     }
+
     
     // Renders Welcome Window
     static void RenderWelcomeWindow() {
+        ImGui::SetNextWindowPos(ImVec2(541, 526));
+        ImGui::SetNextWindowSize(ImVec2(248, 110));
         ImGui::Begin("Welcome", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
         std::string welcome = "Welcome, " + name;
         ImGui::SeparatorText(welcome.c_str());
         ImGui::Separator();
         ImGui::Text("Recent application updates:");
         ImGui::Bullet();
-        ImGui::Text("new banking window");
+        ImGui::Text("account list window");
         ImGui::Bullet();
-        ImGui::Text("new account list");
+        ImGui::Text("savings account list, sorted");
         ImGui::Bullet();
-        ImGui::Text("create account function");
+        ImGui::Text("create/remove account");
         ImGui::Bullet();
         ImGui::Text("updated styling");
         ImGui::Bullet();
-        ImGui::Text("new lists");
+        ImGui::Text("new withdraws/deposits list");
         ImGui::Bullet();
-        ImGui::Text("new buttons");
+        ImGui::Text("added savings/checking");
 
 
         //ImGui::ShowDemoWindow(&show_demo_window);
@@ -231,6 +252,8 @@ namespace App {
     // Renders Customer List Window
     static void RenderCustomerListWindow() {
         ImGui::GetStyle().WindowRounding = 10.0f;
+        ImGui::SetNextWindowPos(ImVec2(6, 57));
+        ImGui::SetNextWindowSize(ImVec2(226, 583));
         ImGui::Begin("Account List:", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground);
 
         if (accounts.empty()) {
@@ -246,7 +269,9 @@ namespace App {
     
     // Renders List Window 1 (sorted descending)
     static void RenderList1Window() {
-        ImGui::Begin("Highest Balances:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
+        ImGui::SetNextWindowPos(ImVec2(240, 58));
+        ImGui::SetNextWindowSize(ImVec2(298, 196));
+        ImGui::Begin("Highest Savings Balances:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
 
         ImGui::GetStyle().WindowRounding = 10.0f;
         ImGui::SetWindowFontScale(0.865f);
@@ -258,6 +283,8 @@ namespace App {
     
     // Renders List Window 2 (recent withdrawals)
     static void RenderList2Window() {
+        ImGui::SetNextWindowPos(ImVec2(240, 258));
+        ImGui::SetNextWindowSize(ImVec2(298, 196));
         ImGui::Begin("Recent Withdrawals:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
 
         ImGui::GetStyle().WindowRounding = 10.0f;
@@ -269,6 +296,8 @@ namespace App {
     
     // Renders List Window 3 (recent deposits)
     static void RenderList3Window() {
+        ImGui::SetNextWindowPos(ImVec2(240, 456));
+        ImGui::SetNextWindowSize(ImVec2(298, 196));
         ImGui::Begin("Recent Deposits:", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground);
 
         ImGui::GetStyle().WindowRounding = 10.0f;
@@ -314,7 +343,7 @@ namespace App {
         FreeConsole(); //free allocated console
 
         accounts = myBank.printVector(); //update strings 
-        sorted_accounts = myBank.sort();
+        sorted_accounts = myBank.printSortedSavings();
         deposits = myBank.printDeposits();
         withdrawals = myBank.printWithdrawals();
     }

@@ -9,8 +9,9 @@
 
 
 //static vars
-const double BankAccount::REWARD_RATE = .02; // 2% reward rate
-const double BankAccount::MIN_REWARD_AMOUNT = 2000; // 2000$ min deposit for reward rate
+const double BankAccount::MIN_BALANCE = 9.99;
+const double BankAccount::REWARD_RATE = .04; // 4% reward rate
+const double BankAccount::MIN_REWARD_AMOUNT = 1000; // 1000$ min deposit for reward rate
 int BankAccount::count = 0;
 
 // -- Constructors -- 
@@ -22,11 +23,12 @@ BankAccount::BankAccount(){
     count++;
 }
 // custom constructor
-BankAccount::BankAccount(std::string accountName, int id, int accountNumber, double accountBalance){
+BankAccount::BankAccount(std::string accountName, int id, int accountNumber, double accountBalance, char accountType){
     this->accountName = accountName;
     this->accountNumber = accountNumber;
     this->id = id;
     this->accountBalance = accountBalance;
+    this->accountType = accountType;
     count++;
 }
 /* copy constructor
@@ -53,19 +55,25 @@ double BankAccount::getAccountBalance() const {
 int BankAccount::getId() const {
     return this->id;
 }
-// -- Mutators -- cannot change number and accountName, setting balance may be needed by admin
+// get account type
+char BankAccount::getAccountType() const{
+    return this->accountType;
+}
+// -- Mutator -- cannot change number and accountName, setting balance may be needed by admin
 void BankAccount::setAccountBalance(double accountBalance){
     this->accountBalance = accountBalance;
 }
+
+
 // display the string representation of the bank account
 std::string BankAccount::toString() const{
     std::ostringstream stream;
     stream.imbue(std::locale("")); //add commas
     stream << std::fixed<< std::setprecision(2) << this->getAccountBalance();
     std::string bal = stream.str();
-     return ("- Name: " + this->getAccountName() + "\n"
+     return ("Account Name: " + this->getAccountName() + "\n"
                + "Account Number: " + std::to_string(this->getAccountNumber()) + "\n"
-               + "Balance: " + bal + "$\n");
+               + "Account Balance: " + bal + "$\n");
 }
 // withdraw the amount if possible
 bool BankAccount::withdraw(double amount){

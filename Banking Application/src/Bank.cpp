@@ -6,7 +6,9 @@
 #include "Bank.h"
 #include <cctype>
 #include <string>
-#include<iomanip>
+#include <iomanip>
+#include <algorithm>
+
 
 // constructor that reads from .txt file by calling the fillVector method to populate the database
 Bank::Bank(std::string filename){
@@ -17,6 +19,7 @@ Bank::Bank(std::string filename){
     }
     fillVector(file);
 }
+
 // withdraw amount
 void Bank::withdraw(){
 
@@ -66,7 +69,7 @@ void Bank::withdraw(){
                 std::cout << "\nAmount Withdrawn from account" << std::endl;
 
                 //store withdrawal in txt
-                std::ofstream outFile2("imgui/withdrawals.txt", std::ios::app); // Open file in append mode
+                std::ofstream outFile2("src/withdrawals.txt", std::ios::app); // Open file in append mode
                 if (outFile2.is_open()) {
                     outFile2 << acc->BankAccount::getAccountName() << " " << amount << "\n";
                     outFile2.close();
@@ -76,7 +79,7 @@ void Bank::withdraw(){
                 }
 
                 // 1. Read the entire file into a vector of strings.
-                 std::ifstream inFile("imgui/BankData.txt");
+                 std::ifstream inFile("src/BankData.txt");
 
                  std::vector<std::string> lines;
                  std::string line;
@@ -98,7 +101,7 @@ void Bank::withdraw(){
                      lines.end());
 
                  // 3. Append the updated account information.
-                 std::ofstream outFile("imgui/BankData.txt"); // Open in write mode, which overwrites
+                 std::ofstream outFile("src/BankData.txt"); // Open in write mode, which overwrites
 
                  // Break the full name back into first and last names
                  std::istringstream iss(accountName);
@@ -106,12 +109,14 @@ void Bank::withdraw(){
                  iss >> firstName >> lastName;
 
                  int id = acc->getId();
+                 char type = acc->getAccountType();
                  double updatedBalance = acc->getAccountBalance();
 
                  outFile << firstName << " " << lastName << " "
                      << id << " "
                      << accountNumber << " "
-                     << updatedBalance << std::endl;
+                     << updatedBalance << " "
+                     << type << std::endl;
 
                  // 4. Write all the remaining lines back to the file.
                  for (const auto& remainingLine : lines) {
@@ -215,7 +220,7 @@ void Bank::deposit(){
         if(acc->getAccountName()==accountName && acc->getAccountNumber()==accountNumber){ 
 
             //store deposit in txt
-            std::ofstream outFile2("imgui/deposits.txt", std::ios::app); // Open file in append mode
+            std::ofstream outFile2("src/deposits.txt", std::ios::app); // Open file in append mode
             if (outFile2.is_open()) {
                 outFile2 << acc->BankAccount::getAccountName() << " " << amount << "\n";
                 outFile2.close();
@@ -225,7 +230,7 @@ void Bank::deposit(){
             }
 
             // 1. Read the entire file into a vector of strings.
-            std::ifstream inFile("imgui/BankData.txt");
+            std::ifstream inFile("src/BankData.txt");
 
             std::vector<std::string> lines;
             std::string line;
@@ -247,7 +252,7 @@ void Bank::deposit(){
                 lines.end());
 
             // 3. Append the updated account information.
-            std::ofstream outFile("imgui/BankData.txt"); // Open in write mode, which overwrites
+            std::ofstream outFile("src/BankData.txt"); // Open in write mode, which overwrites
 
             // Break the full name back into first and last names
             std::istringstream iss(accountName);
@@ -255,13 +260,15 @@ void Bank::deposit(){
             iss >> firstName >> lastName;
 
             int id = acc->getId();
+            char type = acc->getAccountType();
             acc->deposit(amount);
             double updatedBalance = acc->getAccountBalance();
 
             outFile << firstName << " " << lastName << " "
                 << id << " "
                 << accountNumber << " "
-                << updatedBalance << std::endl;
+                << updatedBalance << " "
+                << type << std::endl;
 
             // 4. Write all the remaining lines back to the file.
             for (const auto& remainingLine : lines) {
@@ -292,17 +299,27 @@ void Bank::fillVector(std::ifstream &input){
         std::istringstream iss(line);
         std::string accountName;
         std::string first, last;
+        char accountType;
         int id;
         int accountNumber;
         double accountBalance;
-        if(iss >> first >> last >> id >> accountNumber >> accountBalance){
-            accountsVector.push_back( std::make_shared<BankAccount>((first + " " + last), id, accountNumber, accountBalance) );
+        if (iss >> first >> last >> id >> accountNumber >> accountBalance >> accountType) {
+            if (accountType == 'S') {
+                accountsVector.push_back(std::make_shared<SavingsAccount>((first + " " + last), id, accountNumber, accountBalance, accountType));
+            }
+            else if (accountType == 'C') {
+                accountsVector.push_back(std::make_shared<CheckingAccount>((first + " " + last), id, accountNumber, accountBalance, accountType));
+            }
+            else {
+                std::cerr << "Unknown account type: " << accountType << std::endl;
+            }
         }
         else {
-            std::cout << "Error filling vector!" << std::endl;
+            std::cerr << "Error filling vector!" << std::endl;
         }
     }
 }
+
 // admin function print all accounts
 std::string Bank::printVector(){
     std::ostringstream oss;
@@ -315,7 +332,7 @@ std::string Bank::printVector(){
 std::string Bank::printDeposits() {
     std::ostringstream oss;
 
-    std::ifstream file("imgui/deposits.txt");
+    std::ifstream file("src/deposits.txt");
     if (file.is_open()) {
         std::string firstname, lastname;
         double amount;
@@ -336,7 +353,7 @@ std::string Bank::printDeposits() {
 std::string Bank::printWithdrawals() {
     std::ostringstream oss;
 
-    std::ifstream file("imgui/withdrawals.txt");
+    std::ifstream file("src/withdrawals.txt");
     if (file.is_open()) {
         std::string firstname, lastname;
         double amount;
@@ -353,11 +370,40 @@ std::string Bank::printWithdrawals() {
 
     return oss.str();
 }
+// admin function print all savings accounts sorted
+std::string Bank::printSortedSavings() {
+    // Create a vector to hold only savings account pointers
+    std::vector<std::shared_ptr<BankAccount>> savingsAccounts;
+
+    // Filter only the savings accounts
+    for (const auto& account : accountsVector) {
+        if (account->getAccountType() == 'S') {
+            savingsAccounts.push_back(account);
+        }
+    }
+
+    // Sort the filtered savings accounts in descending order by balance
+    std::sort(savingsAccounts.begin(), savingsAccounts.end(),
+        [](const std::shared_ptr<BankAccount>& a, const std::shared_ptr<BankAccount>& b) {
+            return a->getAccountBalance() > b->getAccountBalance();
+        });
+
+    // Convert sorted savings accounts into a string format
+    std::ostringstream oss;
+    for (const auto& account : savingsAccounts) {
+        oss << account->toString() << "\n";
+    }
+
+    return oss.str();
+}
+
+
 // admin function add account
 void Bank::addAccount() {
     std::string first, last;
     int id;
     int accountNumber;
+    char accountType;
 
     // Input and validation for first name
     std::cout << "Enter New Customer first name: ";
@@ -391,16 +437,26 @@ void Bank::addAccount() {
         std::cout << "Error: Account number must be a 4-digit number.\n";
         return;
     }
+    // Input and validation for account type
+    std::cout << "Enter New Account Type: ";
+    std::cin >> accountType;
+    // add vector by type
+    if (accountType=='C' || accountType == 'c') { // Ensure account type valid
+        accountsVector.push_back(std::make_shared<CheckingAccount>((first + " " + last), id, accountNumber, 0.0, 'C'));
 
-
-
-    // Add account to the vector
-    accountsVector.push_back(std::make_shared<BankAccount>((first + " " + last), id, accountNumber, 0.0));
+    }
+    else if (accountType == 'S' || accountType == 's') { // Ensure account type valid
+        accountsVector.push_back(std::make_shared<SavingsAccount>((first + " " + last), id, accountNumber, 0.0, 'S'));
+    }
+    else {
+        std::cout << "Error: Account number must be savings or checking (S/C).\n";
+        return;
+    }
 
     // Open a file to save account information
-    std::ofstream outFile("imgui/BankData.txt", std::ios::app);
+    std::ofstream outFile("src/BankData.txt", std::ios::app);
     if (outFile.is_open()) {
-        outFile << first << " " << last << " " << id << " " << accountNumber << " 0.0\n";
+        outFile << first << " " << last << " " << id << " " << accountNumber << " 0.0 " << accountType << "\n";
         outFile.close();
     }
     else {
@@ -427,8 +483,8 @@ void Bank::removeAccount(const int id) {
     }
 
     // Open the file for reading and writing
-    std::ifstream inFile("imgui/BankData.txt");
-    std::ofstream outFile("imgui/BankData_temp.txt", std::ios::trunc);
+    std::ifstream inFile("src/BankData.txt");
+    std::ofstream outFile("src/temp.txt", std::ios::trunc);
 
     if (!inFile.is_open() || !outFile.is_open()) {
         std::cerr << "Error opening file for reading or writing.\n";
@@ -464,32 +520,10 @@ void Bank::removeAccount(const int id) {
     outFile.close();
 
     // Replace old file with the new one
-    if (std::remove("imgui/BankData.txt") != 0 || std::rename("imgui/BankData_temp.txt", "imgui/BankData.txt") != 0) {
+    if (std::remove("src/BankData.txt") != 0 || std::rename("src/temp.txt", "src/BankData.txt") != 0) {
         std::cerr << "Error replacing the old file.\n";
     }
     else if (accountFound) {
         std::cout << "Account ID " << id << " removed successfully.\n";
     }
-}
-
-
-// sort accounts
-#include <algorithm>
-#include <sstream>
-
-std::string Bank::sort() {
-    // Sort the accountsVector in descending order, by balance
-    std::sort(accountsVector.begin(), accountsVector.end(),
-        [](const std::shared_ptr<BankAccount>& a, const std::shared_ptr<BankAccount>& b) {
-            return a->getAccountBalance() > b->getAccountBalance();
-        });
-
-    // Convert sorted accounts into a string format
-    std::ostringstream oss;
-    for (const auto& account : accountsVector) {
-        oss << account->toString() << "\n";
-    }
-
-    // Return the sorted accounts as a string
-    return oss.str();
 }
